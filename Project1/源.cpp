@@ -1,64 +1,55 @@
 ﻿#include "bits_stdc++.h"
 using namespace std;
+typedef long long ll;
+
+int p;
+
+ll ksm(ll a, ll b) {
+	ll ans = 1;
+	while (b) {
+		if (b & 1) {
+			ans = (ans * a) % p;
+			--b;
+		}
+		else {
+			b >>= 1;
+			a = (a * a) % p;
+		}
+	}
+	return ans;
+}
+
+ll C(ll n, ll m) {
+	ll a = 1, b = 1;
+	for (int i = n; i > n - m; --i) {
+		a = (a * i) % p;
+	}
+	for (int i = m; i > 1; --i) {
+		b = (b * i) % p;
+	}
+
+	return (a * ksm(b, p - 2)) % p;
+}
+
+ll lucas(ll n, ll m) {
+	if (m == 0) {
+		return 1;
+	}
+
+	return ((lucas(n / p, m / p) % p) * C(n % p, m % p)) % p;
+}
+
 int main(void) {
 
-	string a, b;
-	cin >> a >> b;
+	int T;
+	cin >> T;
 
-	vector<int> A, B;
-	for (int i = a.size() - 1; i >= 0; --i) {
-		A.push_back(a[i] - '0');
-	}
-	for (int i = b.size() - 1; i >= 0; --i) {
-		B.push_back(b[i] - '0');
-	}
+	while (T--) {
+		int n, m;
+		cin >> n >> m >> p;
 
-	vector<int> ans;
-	for (int i = 0; i < b.size(); ++i) {
-		for (int j = 0; j < a.size(); ++j) {
-			int now = A[j] * B[i];
-			if (ans.size() < i + j + 1) {
-				ans.push_back(now % 10);
-				ans.push_back(now / 10);
-			}
-			else if (ans.size() == i + j + 1) {
-				ans[i + j] += now % 10;
-				ans.push_back(now / 10);
-			}
-			else {
-				ans[i + j] += now % 10;
-				ans[i + j + 1] += now / 10;
-			}
-		}
-	}
-
-	for (int i = 0; i < ans.size(); ++i) {
-		if (ans[i] >= 10) {
-			if (ans.size() == i + 1) {
-				ans.push_back(ans[i] / 10);
-			}
-			else {
-				ans[i + 1] += ans[i] / 10;
-			}
-			ans[i] %= 10;
-		}
-	}
-
-	bool beg = false, zero = true;
-	for (int i = ans.size() - 1; i >= 0; --i) {
-		if (beg) {
-			cout << ans[i];
-		}
-		else if (ans[i] != 0) {
-			cout << ans[i];
-			beg = true;
-		}
-		if (ans[i] != 0) {
-			zero = false;
-		}
-	}
-	if (zero) {
-		cout << 0;
+		int t = min(m, n);
+		cout << lucas(n + m, t) << endl;
 	}
 
 	return 0;
