@@ -1,30 +1,48 @@
 ﻿#include "bits_stdc++.h"
 using namespace std;
-
-int gcd(int a, int b) {
-	if (b == 0) {
-		return a;
-	}
-	return gcd(b, a % b);
-}
+typedef long long ll;
 
 int main(void) {
 
-	int n;
-	cin >> n;
-	vector<int> num(n);
-	for (int i = 0; i < n; ++i) {
-		cin >> num[i];
+	ll N;
+	cin >> N;
+
+	if (N == 1) {
+		cout << 0;
+		return 0;
 	}
 
-	int ans = num[0];
-	for (int i = 0; i < n; ++i) {
-		if (num[i] != 0) {
-			ans = gcd(ans, abs(num[i]));
+	vector<int> temp(N, 0);
+	temp[1] = 0;
+	vector<int> prime;
+	vector<bool> isprime(N, true);
+	isprime[1] = false;
+	for (int i = 2; i < N; ++i) {
+		if (isprime[i]) {
+			prime.push_back(i);
+			temp[i] = i - 1;
+		}
+		for (auto x : prime) {
+			if (x * i >= N) {
+				break;
+			}
+			isprime[x * i] = false;
+			if (i % x == 0) {
+				temp[x * i] = temp[i] * x;
+				break;
+			}
+			else {
+				temp[x * i] = temp[i] * (x - 1);
+			}
 		}
 	}
 
-	cout << ans;
+	ll ans = 0;
+	for (ll i = 2; i < N; ++i) {
+		ans += temp[i];
+	}
+
+	cout << ans * 2 + 3;
 
 	return 0;
 }
