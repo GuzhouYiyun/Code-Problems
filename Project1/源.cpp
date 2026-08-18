@@ -3,110 +3,29 @@ using namespace std;
 typedef long long ll;
 int main(void) {
 
-	int T;
-	cin >> T;
+	ll N, B;
+	cin >> N >> B;
 
-	while (T--) {
-		int n;
-		cin >> n;
-		if (n == 1) {
-			int a;
-			cin >> a;
-			cout << 0 << endl;
-			continue;
-		}
-		else if (n == 2) {
-			int a, b;
-			cin >> a >> b;
-			int t = max(abs(a), abs(b));
-			cout << max(t, abs(a - b)) << endl;
-			continue;
-		}
+	vector<ll> P(N), S(N);
+	for (ll i = 0; i < N; ++i) {
+		cin >> P[i] >> S[i];
+	}
 
-		vector<int> z, f;
-		int zero = 0;
-		for (int i = 0; i < n; ++i) {
-			int x;
-			cin >> x;
+	vector<vector<ll>> dp(N + 1, vector<ll>(2, 1e18));
+	dp[0][0] = 0;
+	for (ll i = 0; i < N; ++i) {
+		ll use = P[i] / 2 + S[i], unuse = P[i] + S[i];
+		for (ll j = N; j; --j) {
+			dp[j][0] = min(dp[j - 1][0] + unuse, dp[j][0]);
+			dp[j][1] = min(min(dp[j - 1][0] + use, dp[j - 1][1] + unuse), dp[j][1]);
+		}
+	}
 
-			if (x > 0) {
-				z.push_back(x);
-			}
-			else if (x < 0) {
-				f.push_back(x);
-			}
-			else {
-				++zero;
-			}
+	for (ll i = N; i >= 0; --i) {
+		if (dp[i][0] <= B or dp[i][1] <= B) {
+			cout << i;
+			break;
 		}
-
-		sort(z.begin(), z.end(), [](const int& a, const int& b) {
-			return a > b;
-			});
-		sort(f.begin(), f.end(), [](const int& a, const int& b) {
-			return a < b;
-			});
-
-		ll ans;
-		if (z.empty()) {
-			if (zero) {
-				f.push_back(0);
-			}
-			ll sum = accumulate(f.begin(), f.end(), 0LL);
-			ans = 2LL * f.back() - sum - f.front();
-		}
-		else if (f.empty()) {
-			if (zero) {
-				z.push_back(0);
-			}
-			ll sum = accumulate(z.begin(), z.end(), 0LL);
-			ans = sum + z.front() - 2LL * z.back();
-		}
-		else if (z.size() == 1 and f.size() == 1) {
-			if (zero == 1) {
-				ans = max(2LL * z.front() - f.front(), z.front() - 2LL * f.front());
-			}
-			else {
-				ans = 2LL * z.front() - 2LL * f.front();
-			}
-		}
-		else if (z.size() == 1) {
-			ll sum = accumulate(f.begin(), f.end(), 0LL);
-			if (zero) {
-				ans = 2LL * z.front() - sum - f.front();
-			}
-			else {
-				ll t;
-				if (f.size() != 2) {
-					t = 2LL * z.front() + 2LL * f.back() - sum - f.front();
-				}
-				else {
-					t = 2LL * z.front() - f.front();
-				}
-				ans = max(z.front() - sum - f.front(), t);
-			}
-		}
-		else if (f.size() == 1) {
-			ll sum = accumulate(z.begin(), z.end(), 0LL);
-			if (zero) {
-				ans = sum + z.front() - 2LL * f.front();
-			}
-			else {
-				ll t;
-				if (z.size() != 2) {
-					t = sum - 2LL * z.back() + z.front() - 2LL * f.front();
-				}
-				else {
-					t = z.front() - 2 * f.front();
-				}
-				ans = max(sum + z.front() - f.front(), t);
-			}
-		}
-		else {
-			ans = accumulate(z.begin(), z.end(), (long long)z.front()) - accumulate(f.begin(), f.end(), (long long)f.front());
-		}
-
-		cout << ans << endl;
 	}
 
 	return 0;
